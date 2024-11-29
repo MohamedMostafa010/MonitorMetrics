@@ -77,7 +77,7 @@ docker-compose down
 3- Exit: Closes the application.**
 
 - View Alerts:
-**1- Real-time alerts for critical conditions are displayed as Zenity notifications.**
+**Real-time alerts for critical conditions are displayed as Zenity notifications.**
 
 - View Reports:
-1- **Reports are saved in the monitoring_logs directory. Select a report through the GUI to view details.**
+**Reports are saved in the monitoring_logs directory. Select a report through the GUI to view details.**
