@@ -1,6 +1,6 @@
 # OS 12th Project
 
-# System Monitoring Project
+# System Monitoring Project 
 
 This project delivers a comprehensive system monitoring solution using a Zenity-based graphical user interface (GUI), designed for ease of use and adaptability. It enables users to monitor system performance, hardware health, and generate detailed reports with a user-friendly dashboard. To ensure portability and compatibility across various platforms, the project is fully containerized with Docker, simplifying deployment and usage on diverse operating systems and hardware configurations.
 
