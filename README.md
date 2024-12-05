@@ -74,7 +74,7 @@ local: This option specifies that the restriction applies to local connections, 
 
 2- Run the container:
 ```bash
-docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix system-monitor
+docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix system-monitor 2>dev/null
 ```
 - docker run: Launches a new container from the specified image.
 - --rm: Automatically removes the container when it stops.
@@ -85,6 +85,7 @@ docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env D
 - -env DISPLAY=$DISPLAY: Passes the host's DISPLAY environment variable to the container. This allows GUI applications inside the container to connect to the host's X server and display windows on the host's screen.
 - -v /tmp/.X11-unix:/tmp/.X11-unix: Mounts the host's X server socket (located at /tmp/.X11-unix) into the container at the same path. Facilitates communication between GUI applications in the container and the host's X server for window rendering.
 - system-monitor: Specifies the Docker image to use for creating the container. In this case, it refers to an image named system-monitor.
+- 2>dev/null: To redirect errors to the /dev/null file.
 
 3- Running with Docker Compose (Optional)
 - Start the service:
