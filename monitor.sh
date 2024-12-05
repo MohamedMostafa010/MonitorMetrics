@@ -13,24 +13,22 @@ function check_critical_conditions {
   CRITICAL_DISK_THRESHOLD=90    # Disk usage over 90%
 
   # Memory Usage Check
-MEM_USAGE=$(free | grep Mem | while read _ total used _; do echo "$((100 * used / total))"; done)
+  MEM_USAGE=$(free | grep Mem | while read _ total used _; do echo "$((100 * used / total))"; done)
   if [ "$MEM_USAGE" -gt "$CRITICAL_MEMORY_THRESHOLD" ]; then
     zenity --error --text="ALERT: High Memory Usage ($MEM_USAGE%)"
   fi
 
   # CPU Usage Check (using mpstat to check CPU utilization)
-CPU_USAGE=$(mpstat 1 1 | grep "Average" | sed 's/.*\s\([0-9.]*\)$/\1/' | while read -r idle; do echo $((100 - idle)); done)
-if [ "$CPU_USAGE" -gt "$CRITICAL_CPU_THRESHOLD" ]; then
-  zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)"
-fi
-
-# If you are running on a virtual machine (VM) (which it seems you are based on the output System: VMware, Inc. VMware Virtual Platform), virtual machines typically do not expose hardware sensors such as temperature, fan speed, or voltage, as these resources are abstracted away by the hypervisor.
+  CPU_USAGE=$(mpstat 1 1 | grep "Average" | sed 's/.*\s\([0-9.]*\)$/\1/' | while read -r idle; do echo $((100 - idle)); done)
+  if [ "$CPU_USAGE" -gt "$CRITICAL_CPU_THRESHOLD" ]; then
+    zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)"
+  fi
 
   # Disk Usage Check
-DISK_USAGE=$(df / -h | tail -n 1 | sed -E 's/.* ([0-9]+)%/\1/')
-if [ "$DISK_USAGE" -gt "$CRITICAL_DISK_THRESHOLD" ]; then
-  zenity --error --text="ALERT: High Disk Usage ($DISK_USAGE%)"
-fi
+  DISK_USAGE=$(df / -h | tail -n 1 | sed -E 's/.* ([0-9]+)%/\1/')
+  if [ "$DISK_USAGE" -gt "$CRITICAL_DISK_THRESHOLD" ]; then
+    zenity --error --text="ALERT: High Disk Usage ($DISK_USAGE%)"
+  fi
 }
 
 # Function: Monitor System Metrics
@@ -42,12 +40,13 @@ function monitor_system {
   # CPU Metrics
   echo "=== CPU Metrics ===" > "$REPORT_DIR/cpu_$TIMESTAMP.log"
   mpstat 1 1 >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
-
+  
   # CPU Temperature (requires lm-sensors)
   echo "=== CPU Temperature ===" >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
   sensors >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
-
-  # GPU Metrics (using lshw for basic information)
+  
+  
+  # GPU Metrics
   echo "=== GPU Metrics ===" > "$REPORT_DIR/gpu_$TIMESTAMP.log"
   if command -v lshw >/dev/null 2>&1; then
     lshw -C display >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
@@ -62,7 +61,6 @@ function monitor_system {
   # Disk Usage
   echo "=== Disk Usage ===" > "$REPORT_DIR/disk_$TIMESTAMP.log"
   df -h >> "$REPORT_DIR/disk_$TIMESTAMP.log"
-  # Disk SMART Status (requires smartctl)
   echo "=== SMART Status ===" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
   smartctl --all /dev/sda >> "$REPORT_DIR/disk_$TIMESTAMP.log" 2>/dev/null
 
@@ -81,18 +79,22 @@ function monitor_system {
   # Markdown Report
   REPORT_FILE="$REPORT_DIR/report_$TIMESTAMP.md"
   echo "# System Monitoring Report ($TIMESTAMP)" > "$REPORT_FILE"
-  for file in $REPORT_DIR/*_$TIMESTAMP.log; do
+  for file in "$REPORT_DIR"/*_"$TIMESTAMP".log; do
     SECTION=$(basename "$file" | sed "s/_$TIMESTAMP.log//")
+    echo >> "$REPORT_FILE"
     echo "## $SECTION" >> "$REPORT_FILE"
+    echo >> "$REPORT_FILE"
     cat "$file" >> "$REPORT_FILE"
   done
 
   # Convert Markdown to HTML (requires pandoc)
   if command -v pandoc >/dev/null 2>&1; then
+    # Specify the CSS file to be included in the HTML
     pandoc "$REPORT_FILE" -o "${REPORT_FILE%.md}.html"
   else
     echo "Pandoc not installed. HTML report not generated." >> "$LOG_DIR/monitoring.log"
   fi
+
 
   zenity --info --text="Monitoring completed. Report saved: $REPORT_FILE"
 }
@@ -105,16 +107,28 @@ function view_reports {
   fi
 
   REPORT_DIR=$(zenity --file-selection --title="Select a report folder to view" --directory --filename="$LOG_DIR/")
+  if [ -z "$REPORT_DIR" ]; then
+    zenity --info --text="No folder selected."
+    return
+  fi
 
-  if [ -n "$REPORT_DIR" ]; then
-    REPORT=$(zenity --file-selection --title="Select a report to view" --filename="$REPORT_DIR/")
-    if [ -n "$REPORT" ]; then
-      zenity --text-info --filename="$REPORT" --title="Report Viewer"
+  REPORT=$(zenity --file-selection --title="Select a report to view" --filename="$REPORT_DIR/")
+  if [ -z "$REPORT" ]; then
+    zenity --info --text="No report selected."
+    return
+  fi
+
+  if [ -f "$REPORT" ]; then
+    # Check if the selected file is an HTML file
+    if [[ "$REPORT" == *.html ]]; then
+      # Open the HTML file in the browser with --no-sandbox flag for root user
+      echo "Opening HTML file in browser: $REPORT"
+      chromium --no-sandbox "$REPORT" &
     else
-      zenity --info --text="No report selected."
+      zenity --text-info --filename="$REPORT" --title="Report Viewer"
     fi
   else
-    zenity --info --text="No folder selected."
+    zenity --error --text="The selected file does not exist."
   fi
 }
 
@@ -126,7 +140,7 @@ function interactive_dashboard {
       "1" "Run System Monitoring" \
       "2" "View Historical Reports" \
       "3" "Exit" \
-      --height=600 --width=600)
+      --height=400 --width=400)
 
     case $CHOICE in
       "1") monitor_system ;;
