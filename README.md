@@ -20,11 +20,18 @@ Ensure the following packages are installed:
 - `smartmontools`: For disk health checks.
 - `zenity`: For GUI support.
 - `pandoc`: For generating HTML reports.
+- `curl`: For network testing.
+- `net-tools`: For basic network commands like ifconfig.
+- `iproute2`: For advanced networking tools like ip.
+- `x11-utils`: For managing X11 displays (useful for GUI applications in a container).
+- `lshw`: For detailed hardware information.
+- `xdg-utils`: For opening files and URLs with default desktop applications.
+- `chromium`: For viewing HTML reports.
 
 Install these packages on Debian/Ubuntu-based systems with:
 ```bash
 sudo apt-get update
-sudo apt-get install sysstat lm-sensors smartmontools zenity pandoc
+sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium
 ```
 
 ### For Docker Execution
@@ -54,6 +61,17 @@ chmod +x monitor.sh
 ```bash
 docker build -t system-monitor .
 ```
+2- controlling for the X server in a Unix/Linux environment:
+```bash
+xhost -local:docker
+xhost: A utility to manage the access control list for the X server. It allows or denies connections from clients.
+local: This option specifies that the restriction applies to local connections, meaning connections initiated from the local machine (using UNIX domain sockets).
+:docker: Specifies a particular user or group, in this case, the docker group. When combined with -local, it denies X server access to local processes running as users in the docker group.
+```
+- When using GUI applications inside Docker containers that rely on the host's X server (e.g., to display a graphical window), the container must have permission to connect to the X server. However, allowing all containers unrestricted access to the X server poses security risks.
+
+- Running xhost -local:docker ensures that Docker containers are not automatically granted access to your X server. This is a security measure to prevent untrusted containers from interacting with your host's graphical environment.
+
 2- Run the container:
 ```bash
 docker run --rm -it --name system_monitor system-monitor
