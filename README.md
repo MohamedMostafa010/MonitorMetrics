@@ -74,8 +74,18 @@ local: This option specifies that the restriction applies to local connections, 
 
 2- Run the container:
 ```bash
-docker run --rm -it --name system_monitor system-monitor
+docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix system-monitor
 ```
+- docker run: Launches a new container from the specified image.
+- --rm: Automatically removes the container when it stops.
+- -it: -i, keeps the STDIN (standard input) open even if not attached, -t, allocates a pseudo-TTY (a terminal interface), enabling interactive terminal use. Together, these allow the container to be run interactively.
+- -name system-monitor: Assigns the name system-monitor to the container, makes it easier to reference this container by name in subsequent commands.
+- -privileged: Grants the container additional privileges, including access to host devices and capabilities. Required for operations like accessing hardware or modifying certain system-level configurations, e.g., reading disk SMART status or GPU metrics.
+- -device=/dev/sda: Provides access to the host's /dev/sda device (a storage device like a hard drive or SSD) inside the container. Allows tools like smartctl (used in the script) to query the physical disk's health and attributes.
+- -env DISPLAY=$DISPLAY: Passes the host's DISPLAY environment variable to the container. This allows GUI applications inside the container to connect to the host's X server and display windows on the host's screen.
+- -v /tmp/.X11-unix:/tmp/.X11-unix: Mounts the host's X server socket (located at /tmp/.X11-unix) into the container at the same path. Facilitates communication between GUI applications in the container and the host's X server for window rendering.
+- system-monitor: Specifies the Docker image to use for creating the container. In this case, it refers to an image named system-monitor.
+
 3- Running with Docker Compose
 - Start the service:
 ```bash
