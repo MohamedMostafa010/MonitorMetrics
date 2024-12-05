@@ -86,7 +86,7 @@ docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env D
 - -v /tmp/.X11-unix:/tmp/.X11-unix: Mounts the host's X server socket (located at /tmp/.X11-unix) into the container at the same path. Facilitates communication between GUI applications in the container and the host's X server for window rendering.
 - system-monitor: Specifies the Docker image to use for creating the container. In this case, it refers to an image named system-monitor.
 
-3- Running with Docker Compose
+3- Running with Docker Compose (Optional)
 - Start the service:
 ```bash
 docker-compose up
