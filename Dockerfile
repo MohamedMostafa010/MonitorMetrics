@@ -4,7 +4,7 @@ FROM debian:latest
 # Set environment variables to avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update the system and install necessary tools
+# Update the system and install necessary tools, including a browser
 RUN apt-get update && apt-get install -y \
     sysstat \
     lm-sensors \
@@ -15,6 +15,9 @@ RUN apt-get update && apt-get install -y \
     net-tools \
     iproute2 \
     x11-utils \
+    lshw \
+    xdg-utils \
+    chromium \
     && rm -rf /var/lib/apt/lists/*  # Clean up the apt cache to reduce image size
 
 # Copy the monitoring script into the container
