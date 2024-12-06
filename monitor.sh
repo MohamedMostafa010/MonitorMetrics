@@ -4,11 +4,6 @@
 LOG_DIR="./monitoring_logs"
 mkdir -p "$LOG_DIR"
 
-# Ensure D-Bus is initialized
-eval $(dbus-launch --sh-syntax)
-export DBUS_SESSION_BUS_ADDRESS
-export DBUS_SESSION_BUS_PID
-
 # Function to check for critical conditions and trigger alerts
 function check_critical_conditions {
   # Define alert thresholds
@@ -91,13 +86,33 @@ function monitor_system {
     cat "$file" >> "$REPORT_FILE"
   done
 
-  # Convert Markdown to HTML (requires pandoc)
-  if command -v pandoc >/dev/null 2>&1; then
-    # Specify the CSS file to be included in the HTML
-    pandoc "$REPORT_FILE" -o "${REPORT_FILE%.md}.html"
-  else
-    echo "Pandoc not installed. HTML report not generated." >> "$LOG_DIR/monitoring.log"
-  fi
+  # HTML Report
+  REPORT_FILE="$REPORT_DIR/report_$TIMESTAMP.html"
+  echo "<!DOCTYPE html>" > "$REPORT_FILE"
+  echo "<html lang='en'>" >> "$REPORT_FILE"
+  echo "<head>" >> "$REPORT_FILE"
+  echo "<meta charset='UTF-8'>" >> "$REPORT_FILE"
+  echo "<meta name='viewport' content='width=device-width, initial-scale=1.0'>" >> "$REPORT_FILE"
+  echo "<title>System Monitoring Report ($TIMESTAMP)</title>" >> "$REPORT_FILE"
+  echo "<style>" >> "$REPORT_FILE"
+  echo "body { font-family: Arial, sans-serif; margin: 20px; }" >> "$REPORT_FILE"
+  echo "h1, h2 { color: #333; }" >> "$REPORT_FILE"
+  echo "pre { background: #f4f4f4; padding: 10px; border: 1px solid #ddd; white-space: pre-wrap; word-wrap: break-word; }" >> "$REPORT_FILE"
+  echo "</style>" >> "$REPORT_FILE"
+  echo "</head>" >> "$REPORT_FILE"
+  echo "<body>" >> "$REPORT_FILE"
+  echo "<h1>System Monitoring Report ($TIMESTAMP)</h1>" >> "$REPORT_FILE"
+
+  for file in "$REPORT_DIR"/*_"$TIMESTAMP".log; do
+    SECTION=$(basename "$file" | sed "s/_$TIMESTAMP.log//")
+    echo "<h2>$SECTION</h2>" >> "$REPORT_FILE"
+    echo "<pre>" >> "$REPORT_FILE"
+    cat "$file" >> "$REPORT_FILE"
+    echo "</pre>" >> "$REPORT_FILE"
+  done
+
+  echo "</body>" >> "$REPORT_FILE"
+  echo "</html>" >> "$REPORT_FILE"
 
   zenity --info --text="Monitoring completed. Report saved: $REPORT_FILE"
 }
@@ -135,8 +150,7 @@ function view_reports {
   # Open the selected file
   if [ -f "$REPORT" ]; then
     if [[ "$REPORT" == *.html ]]; then
-      # Open HTML file in browser (use --no-sandbox if running as root)
-      chromium --no-sandbox "$REPORT" &
+      chromium "$REPORT" &
     else
       # Open other files in a text viewer
       zenity --text-info --filename="$REPORT" --title="Report Viewer"
