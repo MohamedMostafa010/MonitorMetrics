@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
     lshw \
     xdg-utils \
     chromium \
+    dbus-x11 \
     && rm -rf /var/lib/apt/lists/*  # Clean up the apt cache to reduce image size
 
 # Copy the monitoring script into the container
