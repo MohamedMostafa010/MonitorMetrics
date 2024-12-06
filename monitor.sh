@@ -4,6 +4,11 @@
 LOG_DIR="./monitoring_logs"
 mkdir -p "$LOG_DIR"
 
+# Ensure D-Bus is initialized
+eval $(dbus-launch --sh-syntax)
+export DBUS_SESSION_BUS_ADDRESS
+export DBUS_SESSION_BUS_PID
+
 # Function to check for critical conditions and trigger alerts
 function check_critical_conditions {
   # Define alert thresholds
@@ -44,7 +49,6 @@ function monitor_system {
   # CPU Temperature (requires lm-sensors)
   echo "=== CPU Temperature ===" >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
   sensors >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
-  
   
   # GPU Metrics
   echo "=== GPU Metrics ===" > "$REPORT_DIR/gpu_$TIMESTAMP.log"
@@ -95,7 +99,6 @@ function monitor_system {
     echo "Pandoc not installed. HTML report not generated." >> "$LOG_DIR/monitoring.log"
   fi
 
-
   zenity --info --text="Monitoring completed. Report saved: $REPORT_FILE"
 }
 
@@ -106,29 +109,40 @@ function view_reports {
     return
   fi
 
-  REPORT_DIR=$(zenity --file-selection --title="Select a report folder to view" --directory --filename="$LOG_DIR/")
-  if [ -z "$REPORT_DIR" ]; then
-    zenity --info --text="No folder selected."
+  # Allow selection of files or directories
+  SELECTION=$(zenity --file-selection --title="Select a report or folder to view" --filename="$LOG_DIR/")
+  if [ -z "$SELECTION" ]; then
+    zenity --info --text="No selection made."
     return
   fi
 
-  REPORT=$(zenity --file-selection --title="Select a report to view" --filename="$REPORT_DIR/")
+  if [ -d "$SELECTION" ]; then
+    # If a directory is selected, prompt to select a file within it
+    REPORT=$(zenity --file-selection --title="Select a report to view" --filename="$SELECTION/")
+  elif [ -f "$SELECTION" ]; then
+    # If a file is selected directly, use it
+    REPORT="$SELECTION"
+  else
+    zenity --error --text="Invalid selection. Please select a valid file or folder."
+    return
+  fi
+
   if [ -z "$REPORT" ]; then
     zenity --info --text="No report selected."
     return
   fi
 
+  # Open the selected file
   if [ -f "$REPORT" ]; then
-    # Check if the selected file is an HTML file
     if [[ "$REPORT" == *.html ]]; then
-      # Open the HTML file in the browser with --no-sandbox flag for root user
-      echo "Opening HTML file in browser: $REPORT"
+      # Open HTML file in browser (use --no-sandbox if running as root)
       chromium --no-sandbox "$REPORT" &
     else
+      # Open other files in a text viewer
       zenity --text-info --filename="$REPORT" --title="Report Viewer"
     fi
   else
-    zenity --error --text="The selected file does not exist."
+    zenity --error --text="The selected file does not exist or is not a valid file."
   fi
 }
 
