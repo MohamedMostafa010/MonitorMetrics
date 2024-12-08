@@ -74,7 +74,7 @@ local: This option specifies that the restriction applies to local connections, 
 
 2- Run the container:
 ```bash
-docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix system-monitor > /dev/null 2>&1
+docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host system-monitor > /dev/null 2>&1
 ```
 - docker run: Launches a new container from the specified image.
 - --rm: Automatically removes the container when it stops.
@@ -87,6 +87,7 @@ docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env D
 - system-monitor: Specifies the Docker image to use for creating the container. In this case, it refers to an image named system-monitor.
 - \> dev/null: Redirects standard output (stdout) to /dev/null, effectively discarding it.
 - 2>&1 : Redirects standard error (stderr) to standard output (stdout), so both are sent to /dev/nul
+- --net=host : The --net=host option in Docker specifies that the container should use the host machine's network stack instead of creating its own isolated network. This means that the container will have direct access to the host's network interfaces and IP addresses, allowing it to communicate with the outside world using the host’s networking configuration. For a GUI application to display on the host machine’s screen, the container needs access to the X11 server, typically by setting the DISPLAY environment variable and mounting /tmp/.X11-unix from the host to the container. The issue could have been caused by the container not having proper network permissions to access the X11 server. X11 uses access control via authorization tokens stored in files like ~/.Xauthority. With --net=host, the container may have been able to bypass some network-related restrictions, and thus, properly connect to the X11 server.
 
 3- Running with Docker Compose (Optional)
 - Start the service:
