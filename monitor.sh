@@ -1,3 +1,4 @@
+ubuntu@WindowsOC:~/OS_Project_12th$ cat monitor.sh
 #!/bin/bash
 
 # Directory to store logs and reports
@@ -40,17 +41,19 @@ function monitor_system {
   # CPU Metrics
   echo "=== CPU Metrics ===" > "$REPORT_DIR/cpu_$TIMESTAMP.log"
   mpstat 1 1 >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
-  
+
   # CPU Temperature (requires lm-sensors)
   echo "=== CPU Temperature ===" >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
   sensors >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
-  
+
   # GPU Metrics
   echo "=== GPU Metrics ===" > "$REPORT_DIR/gpu_$TIMESTAMP.log"
-  if command -v lshw >/dev/null 2>&1; then
+  if command -v nvidia-smi >/dev/null 2>&1; then
+    nvidia-smi --query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total --format=csv >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
+  elif command -v lshw >/dev/null 2>&1; then
     lshw -C display >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
   else
-    echo "lshw not found. GPU metrics skipped." >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
+    echo "No GPU monitoring tools found. GPU metrics skipped." >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
   fi
 
   # Memory Metrics
@@ -130,7 +133,7 @@ function view_reports {
   fi
 
   # Allow selection of files or directories
-  SELECTION=$(zenity --file-selection --title="Select a report or folder to view" --filename="$LOG_DIR/") 
+  SELECTION=$(zenity --file-selection --title="Select a report or folder to view" --filename="$LOG_DIR/")
   if [ -z "$SELECTION" ]; then
     zenity --info --text="No selection made."
     return
