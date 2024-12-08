@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
 COPY monitor.sh /usr/local/bin/monitor.sh
 
 # Copy the CSS file into the container
-COPY report.css /usr/local/share/css/report.css  # Include the CSS file
+COPY report.css /usr/local/share/css/report.css
 
 # Make the script executable
 RUN chmod +x /usr/local/bin/monitor.sh
