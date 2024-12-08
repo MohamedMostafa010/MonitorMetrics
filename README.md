@@ -63,7 +63,7 @@ docker build -t system-monitor .
 ```
 2- controlling for the X server in a Unix/Linux environment:
 ```bash
-xhost -local:docker
+xhost +local:docker
 xhost: A utility to manage the access control list for the X server. It allows or denies connections from clients.
 local: This option specifies that the restriction applies to local connections, meaning connections initiated from the local machine (using UNIX domain sockets).
 :docker: Specifies a particular user or group, in this case, the docker group. When combined with -local, it denies X server access to local processes running as users in the docker group.
