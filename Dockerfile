@@ -4,8 +4,17 @@ FROM debian:latest
 # Set environment variables to avoid interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update the system and install necessary tools, including a browser
+# Add NVIDIA repository and install CUDA manually
+RUN apt-get update && apt-get install -y wget gnupg2 && \
+    wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb && \
+    dpkg -i cuda-keyring_1.0-1_all.deb && \
+    apt-get update && apt-get install -y \
+    cuda-toolkit-11-8
+
+# Install other necessary packages
 RUN apt-get update && apt-get install -y \
+    wget \
+    liburcu-dev \
     sysstat \
     lm-sensors \
     smartmontools \
@@ -18,6 +27,7 @@ RUN apt-get update && apt-get install -y \
     lshw \
     xdg-utils \
     chromium \
+    mesa-utils \
     && rm -rf /var/lib/apt/lists/*  # Clean up the apt cache to reduce image size
 
 # Copy the monitoring script into the container
