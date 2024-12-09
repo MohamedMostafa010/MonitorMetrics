@@ -1,4 +1,3 @@
-ubuntu@WindowsOC:~/OS_Project_12th$ cat monitor.sh
 #!/bin/bash
 
 # Directory to store logs and reports
