@@ -40,7 +40,7 @@ sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-
 
 ## Installation and Setup
 
-### Running Locally (Without Docker)
+### Running Locally (Without Docker) on VMs or WSL 2
 
 1- Clone the repository:
 ```bash
@@ -56,12 +56,33 @@ chmod +x monitor.sh
 ./monitor.sh
 ```
 
-### Running with Docker
-1- Build the Docker image:
+### Running with Docker on VMs or WSL 2
+1- Install Docker on Linux (You can also install Docker by following the instructions on the official [Docker Website](https://docs.docker.com/engine/install/)):
+```bash
+sudo apt-get update
+sudo apt-get install -y docker.io
+```
+- Or on Windows, [Docker Website](https://docs.docker.com/engine/install/):
+- After installing Docker Desktop from the website above, make sure it's running. Docker Desktop provides a Docker daemon that WSL can access.
+- Configure WSL Integration with Docker Desktop:
+- Open Docker Desktop.
+- Go to Settings (the gear icon in the top-right).
+- In the General tab, ensure that Enable the experimental WSL 2-based engine is checked.
+- Go to the Resources tab and then the WSL Integration section.
+- Ensure that your WSL distributions (like Ubuntu) are enabled to use Docker.
+- Make sure your WSL distributions (e.g., Ubuntu) are selected. You can toggle on the distributions you want to use Docker with (typically, you’ll select the one you’re using, e.g., Ubuntu).
+- Click Apply & Restart if you made any changes.
+- Check Docker Status in WSL:
+```bash
+docker --version
+docker info
+```
+
+2- Build the Docker image:
 ```bash
 docker build -t system-monitor .
 ```
-2- controlling for the X server in a Unix/Linux environment:
+3- controlling for the X server in a Unix/Linux environment:
 ```bash
 xhost +local:docker
 xhost: A utility to manage the access control list for the X server. It allows or denies connections from clients.
@@ -89,7 +110,7 @@ docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env D
 - 2>&1 : Redirects standard error (stderr) to standard output (stdout), so both are sent to /dev/nul
 - --net=host : The --net=host option in Docker specifies that the container should use the host machine's network stack instead of creating its own isolated network. This means that the container will have direct access to the host's network interfaces and IP addresses, allowing it to communicate with the outside world using the host’s networking configuration. For a GUI application to display on the host machine’s screen, the container needs access to the X11 server, typically by setting the DISPLAY environment variable and mounting /tmp/.X11-unix from the host to the container. The issue could have been caused by the container not having proper network permissions to access the X11 server. X11 uses access control via authorization tokens stored in files like ~/.Xauthority. With --net=host, the container may have been able to bypass some network-related restrictions, and thus, properly connect to the X11 server.
 
-3- Running with Docker Compose (Optional)
+4- Running with Docker Compose (Optional)
 - Start the service:
 ```bash
 docker-compose up
