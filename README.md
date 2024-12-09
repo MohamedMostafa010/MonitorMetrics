@@ -42,16 +42,23 @@ sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-
 
 ### Running Locally (Without Docker) on VMs or WSL 2
 
-1- Clone the repository:
+1- Ensure that above requirements are installed by running this command:
+```bash
+sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium
+```
+
+2- Clone the repository:
 ```bash
 git clone https://github.com/yourusername/system-monitoring.git
 cd system-monitoring
 ```
-2- Make the script executable:
+
+3- Make the script executable:
 ```bash
 chmod +x monitor.sh
 ```
-3- Run the script:
+
+4- Run the script:
 ```bash
 ./monitor.sh
 ```
