@@ -60,9 +60,10 @@ cd system-monitoring
 chmod +x monitor.sh
 ```
 
-4- Run the script:
+4- Run the script (one of the two ways):
 ```bash
 ./monitor.sh
+bash monitor.sh
 ```
 
 ### Running with Docker on VMs or WSL 2
