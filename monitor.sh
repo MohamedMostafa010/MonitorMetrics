@@ -8,7 +8,7 @@ mkdir -p "$LOG_DIR"
 function check_critical_conditions {
   # Define alert thresholds
   CRITICAL_MEMORY_THRESHOLD=1  # Memory usage over 80%
-  CRITICAL_CPU_THRESHOLD=1     # CPU usage over 90%
+  CRITICAL_CPU_THRESHOLD=0     # CPU usage over 90%
   CRITICAL_TEMP_THRESHOLD=80    # Temperature over 80°C
   CRITICAL_DISK_THRESHOLD=1    # Disk usage over 90%
 
@@ -18,9 +18,9 @@ function check_critical_conditions {
     zenity --error --text="ALERT: High Memory Usage ($MEM_USAGE%)" &
   fi
 
-  # CPU Usage Check
   CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')  # User + System CPU usage
-  if echo "$CPU_USAGE > $CRITICAL_CPU_THRESHOLD" | bc -l | grep -q 1; then
+  echo "CPU Usage: $CPU_USAGE"
+  if echo "$CPU_USAGE >= $CRITICAL_CPU_THRESHOLD" | bc -l | grep -q 1; then
     zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)" &
   fi
 
@@ -59,10 +59,19 @@ function monitor_system {
   # GPU Metrics
   echo "=== GPU Metrics ===" > "$REPORT_DIR/gpu_$TIMESTAMP.log"
   if command -v nvidia-smi >/dev/null 2>&1; then
+    # NVIDIA GPU Metrics
+    echo "NVIDIA GPU Detected:" >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
     nvidia-smi --query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total --format=csv >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
+  elif command -v rocm-smi >/dev/null 2>&1; then
+    # AMD GPU Metrics
+    echo "AMD GPU Detected:" >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
+    rocm-smi >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
   elif command -v lshw >/dev/null 2>&1; then
+    # Fallback to lshw
+    echo "Fallback to lshw for GPU info:" >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
     lshw -C display >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
   else
+    # No GPU monitoring tools found
     echo "No GPU monitoring tools found. GPU metrics skipped." >> "$REPORT_DIR/gpu_$TIMESTAMP.log"
   fi
 
