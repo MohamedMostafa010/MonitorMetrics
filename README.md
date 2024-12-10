@@ -29,12 +29,13 @@ Ensure the following packages are installed:
 - `chromium`: For viewing HTML reports.
 - `mesa-utils`: For providing OpenGL utilities.
 - `bc`: For performing floating-point and arbitrary precision calculations in shell scripts.
-- `CUDA Toolkit 11.8`: For GPU monitoring and CUDA-based computations.
+- `CUDA Toolkit 11.8`: The NVIDIA System Management Interface tool for monitoring and managing NVIDIA GPUs.
+- `rocm-smi` : The ROCm System Management Interface tool for monitoring and managing AMD GPUs.
 
 Install these packages on Debian/Ubuntu-based systems with:
 ```bash
 sudo apt-get update
-sudo apt-get update && sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium mesa-utils bc
+sudo apt-get update && sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium mesa-utils bc rocm-smi
 wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
 sudo dpkg -i cuda-keyring_1.0-1_all.deb
 ```
