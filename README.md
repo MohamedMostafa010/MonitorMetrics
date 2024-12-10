@@ -67,22 +67,27 @@ bash monitor.sh
 ```
 
 ### Running with Docker on VMs or WSL 2
-1- Install Docker on Linux (You can also install Docker by following the instructions on the official [Docker Website](https://docs.docker.com/engine/install/)):
+1- Install Docker on Linux (You can also install Docker by following the instructions on the official [**Docker Website**](https://docs.docker.com/engine/install/)):
 ```bash
 sudo apt-get update
 sudo apt-get install -y docker.io
 ```
 
-2- Or on Windows, [Docker Website](https://docs.docker.com/engine/install/):
-- After installing Docker Desktop from the website above, make sure it's running. Docker Desktop provides a Docker daemon that WSL can access.
-- Configure WSL Integration with Docker Desktop:
-- Open Docker Desktop.
-- Go to Settings (the gear icon in the top-right).
-- In the General tab, ensure that Enable the experimental WSL 2-based engine is checked.
-- Go to the Resources tab and then the WSL Integration section.
-- Ensure that your WSL distributions (like Ubuntu) are enabled to use Docker.
-- Make sure your WSL distributions (e.g., Ubuntu) are selected. You can toggle on the distributions you want to use Docker with (typically, you’ll select the one you’re using, e.g., Ubuntu).
-- Click Apply & Restart if you made any changes.
+2- Or on Windows, [**Docker Website**](https://docs.docker.com/engine/install/):
+- After installing **Docker Desktop** from the website above, make sure it's running. Docker Desktop provides a Docker daemon that WSL can access.
+- Configure **WSL Integration** with Docker Desktop:
+  - Open **Docker Desktop**.
+  - Go to Settings (the **gear icon in the top-right**).
+  - In the General tab, ensure that **Enable the experimental WSL 2-based engine is checked**.
+  - Go to the **Resources tab** and then the **WSL Integration section**.
+  - Ensure that your WSL distributions (like **Ubuntu**) are enabled to use Docker.
+  - Make sure your WSL distributions (e.g., Ubuntu) are selected. You can toggle on the distributions you want to use Docker with (typically, you’ll select the one you’re using, e.g., Ubuntu).
+  - Click **Apply & Restart** if you made any changes.
+- Check Docker Status in WSL:
+```bash
+docker --version
+docker info
+```
 
 3- Check Docker Status in WSL:
 ```bash
