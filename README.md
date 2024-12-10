@@ -107,7 +107,7 @@ local: This option specifies that the restriction applies to local connections, 
 
 2- Run the container:
 ```bash
-docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host system-monitor > /dev/null 2>&1
+docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host --gpus all -v /home/user/system_logs:/app/monitoring_logs system-monitor > /dev/null 2>&1
 ```
 - docker run: Launches a new container from the specified image.
 - --rm: Automatically removes the container when it stops.
@@ -117,10 +117,12 @@ docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env D
 - -device=/dev/sda: Provides access to the host's /dev/sda device (a storage device like a hard drive or SSD) inside the container. Allows tools like smartctl (used in the script) to query the physical disk's health and attributes.
 - -env DISPLAY=$DISPLAY: Passes the host's DISPLAY environment variable to the container. This allows GUI applications inside the container to connect to the host's X server and display windows on the host's screen.
 - -v /tmp/.X11-unix:/tmp/.X11-unix: Mounts the host's X server socket (located at /tmp/.X11-unix) into the container at the same path. Facilitates communication between GUI applications in the container and the host's X server for window rendering.
+- --net=host : The --net=host option in Docker specifies that the container should use the host machine's network stack instead of creating its own isolated network. This means that the container will have direct access to the host's network interfaces and IP addresses, allowing it to communicate with the outside world using the host’s networking configuration. For a GUI application to display on the host machine’s screen, the container needs access to the X11 server, typically by setting the DISPLAY environment variable and mounting /tmp/.X11-unix from the host to the container. The issue could have been caused by the container not having proper network permissions to access the X11 server. X11 uses access control via authorization tokens stored in files like ~/.Xauthority. With --net=host, the container may have been able to bypass some network-related restrictions, and thus, properly connect to the X11 server.
+- --gpus all: Grants the container access to all GPUs on the host, necessary for running GPU-based tasks or CUDA-enabled applications.
+- -v /home/user/system_logs:/app/monitoring_logs: Mounts a host directory (/home/user/system_logs) to the container's directory (/app/monitoring_logs), enabling log persistence and sharing between the host and container.
 - system-monitor: Specifies the Docker image to use for creating the container. In this case, it refers to an image named system-monitor.
 - \> dev/null: Redirects standard output (stdout) to /dev/null, effectively discarding it.
-- 2>&1 : Redirects standard error (stderr) to standard output (stdout), so both are sent to /dev/nul
-- --net=host : The --net=host option in Docker specifies that the container should use the host machine's network stack instead of creating its own isolated network. This means that the container will have direct access to the host's network interfaces and IP addresses, allowing it to communicate with the outside world using the host’s networking configuration. For a GUI application to display on the host machine’s screen, the container needs access to the X11 server, typically by setting the DISPLAY environment variable and mounting /tmp/.X11-unix from the host to the container. The issue could have been caused by the container not having proper network permissions to access the X11 server. X11 uses access control via authorization tokens stored in files like ~/.Xauthority. With --net=host, the container may have been able to bypass some network-related restrictions, and thus, properly connect to the X11 server.
+- 2>&1 : Redirects standard error (stderr) to standard output (stdout), so both are sent to /dev/null
 
 4- Running with Docker Compose (Optional)
 - Start the service:
