@@ -136,13 +136,13 @@ docker-compose down
 ## How to Use
 
 ### Launch the Dashboard
-- The script opens a Zenity-based GUI with three options:
-**1- Run System Monitoring: Collects metrics and generates a report.
-2- View Historical Reports: Browse and view saved reports.
-3- Exit: Closes the application.**
+**- The script opens a Zenity-based GUI with three options:**
+  1- Run System Monitoring: Collects metrics and generates a report.
+  2- View Historical Reports: Browse and view saved reports.
+  3- Exit: Closes the application.**
 
-- View Alerts:
-**Real-time alerts for critical conditions are displayed as Zenity notifications.**
+**- View Alerts:**
+  - Real-time alerts for critical conditions are displayed as Zenity notifications.
 
-- View Reports:
-**Reports are saved in the monitoring_logs directory. Select a report through the GUI to view details.**
+**- View Reports:**
+  - Reports are saved in the monitoring_logs directory. Select a report through the GUI to view details.
