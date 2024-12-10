@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y \
     chromium \
     mesa-utils \
     bc \
+    rocm-smi \
     && rm -rf /var/lib/apt/lists/*  # Clean up the apt cache to reduce image size
 
 # Copy the monitoring script into the container
