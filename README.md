@@ -89,17 +89,12 @@ docker --version
 docker info
 ```
 
-3- Check Docker Status in WSL:
-```bash
-docker --version
-docker info
-```
-
-4- Build the Docker image:
+3- Build the Docker image:
 ```bash
 docker build -t system-monitor .
 ```
-5- controlling for the X server in a Unix/Linux environment:
+
+4- controlling for the X server in a Unix/Linux environment:
 ```bash
 xhost +local:docker
 xhost: A utility to manage the access control list for the X server. It allows or denies connections from clients.
