@@ -1,34 +1,45 @@
 #!/bin/bash
 
 # Directory to store logs and reports
-LOG_DIR="./monitoring_logs"
+LOG_DIR="/app/monitoring_logs"
 mkdir -p "$LOG_DIR"
 
 # Function to check for critical conditions and trigger alerts
 function check_critical_conditions {
   # Define alert thresholds
-  CRITICAL_MEMORY_THRESHOLD=80  # Memory usage over 80%
-  CRITICAL_CPU_THRESHOLD=90     # CPU usage over 90%
+  CRITICAL_MEMORY_THRESHOLD=1  # Memory usage over 80%
+  CRITICAL_CPU_THRESHOLD=1     # CPU usage over 90%
   CRITICAL_TEMP_THRESHOLD=80    # Temperature over 80°C
-  CRITICAL_DISK_THRESHOLD=90    # Disk usage over 90%
+  CRITICAL_DISK_THRESHOLD=1    # Disk usage over 90%
 
   # Memory Usage Check
-  MEM_USAGE=$(free | grep Mem | while read _ total used _; do echo "$((100 * used / total))"; done)
+  MEM_USAGE=$(free | awk '/Mem:/ {printf "%.0f", $3/$2 * 100}')
   if [ "$MEM_USAGE" -gt "$CRITICAL_MEMORY_THRESHOLD" ]; then
-    zenity --error --text="ALERT: High Memory Usage ($MEM_USAGE%)"
+    zenity --error --text="ALERT: High Memory Usage ($MEM_USAGE%)" &
   fi
 
-  # CPU Usage Check (using mpstat to check CPU utilization)
-  CPU_USAGE=$(mpstat 1 1 | grep "Average" | sed 's/.*\s\([0-9.]*\)$/\1/' | while read -r idle; do echo $((100 - idle)); done)
-  if [ "$CPU_USAGE" -gt "$CRITICAL_CPU_THRESHOLD" ]; then
-    zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)"
+  # CPU Usage Check
+  CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')  # User + System CPU usage
+  if echo "$CPU_USAGE > $CRITICAL_CPU_THRESHOLD" | bc -l | grep -q 1; then
+    zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)" &
   fi
 
   # Disk Usage Check
-  DISK_USAGE=$(df / -h | tail -n 1 | sed -E 's/.* ([0-9]+)%/\1/')
+  DISK_USAGE=$(df / -h | awk 'NR==2 {gsub("%", "", $5); print $5}')
   if [ "$DISK_USAGE" -gt "$CRITICAL_DISK_THRESHOLD" ]; then
-    zenity --error --text="ALERT: High Disk Usage ($DISK_USAGE%)"
+    zenity --error --text="ALERT: High Disk Usage ($DISK_USAGE%)" &
   fi
+
+  # Temperature Check (if sensors is available)
+  if command -v sensors >/dev/null 2>&1; then
+    TEMP=$(sensors | awk '/^Package id 0:/ {print $4}' | tr -d '+°C')
+    if [ "$TEMP" ] && [ "$(echo "$TEMP > $CRITICAL_TEMP_THRESHOLD" | bc -l)" -eq 1 ]; then
+      zenity --error --text="ALERT: High Temperature ($TEMP°C)" &
+    fi
+  fi
+
+  # Wait a moment to ensure alerts are displayed
+  sleep 1
 }
 
 # Function: Monitor System Metrics
@@ -58,21 +69,29 @@ function monitor_system {
   # Memory Metrics
   echo "=== Memory Metrics ===" > "$REPORT_DIR/memory_$TIMESTAMP.log"
   free -h >> "$REPORT_DIR/memory_$TIMESTAMP.log"
+  echo "Memory Details:" >> "$REPORT_DIR/memory_$TIMESTAMP.log"
+  vmstat -s >> "$REPORT_DIR/memory_$TIMESTAMP.log"
 
   # Disk Usage
   echo "=== Disk Usage ===" > "$REPORT_DIR/disk_$TIMESTAMP.log"
   df -h >> "$REPORT_DIR/disk_$TIMESTAMP.log"
+  echo "Disk Inodes Usage:" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
+  df -i >> "$REPORT_DIR/disk_$TIMESTAMP.log"
   echo "=== SMART Status ===" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
-  smartctl --all /dev/sda >> "$REPORT_DIR/disk_$TIMESTAMP.log" 2>/dev/null
+  smartctl -T permissive --all /dev/sda >> "$REPORT_DIR/disk_$TIMESTAMP.log" 2>/dev/null
 
   # Network Statistics
   echo "=== Network Statistics ===" > "$REPORT_DIR/network_$TIMESTAMP.log"
   ifconfig >> "$REPORT_DIR/network_$TIMESTAMP.log"
   ip -s link >> "$REPORT_DIR/network_$TIMESTAMP.log"
+  echo "Network Connections:" >> "$REPORT_DIR/network_$TIMESTAMP.log"
+  netstat -tuln >> "$REPORT_DIR/network_$TIMESTAMP.log"
 
   # System Load Metrics
   echo "=== System Load Metrics ===" > "$REPORT_DIR/load_$TIMESTAMP.log"
   uptime >> "$REPORT_DIR/load_$TIMESTAMP.log"
+  echo "Detailed Load Average:" >> "$REPORT_DIR/load_$TIMESTAMP.log"
+  cat /proc/loadavg >> "$REPORT_DIR/load_$TIMESTAMP.log"
 
   # Check for critical conditions
   check_critical_conditions
