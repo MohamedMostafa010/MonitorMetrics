@@ -2,14 +2,14 @@
 
 # System Monitoring Project 
 
-This project delivers a comprehensive system monitoring solution using a Zenity-based graphical user interface (GUI), designed for ease of use and adaptability. It enables users to monitor system performance, hardware health, and generate detailed reports with a user-friendly dashboard. To ensure portability and compatibility across various platforms, the project is fully containerized with Docker, simplifying deployment and usage on diverse operating systems and hardware configurations.
+This project delivers a comprehensive system monitoring solution using a **Zenity-based graphical user interface (GUI)**, designed for ease of use and adaptability. It enables users to monitor system performance, hardware health, and generate detailed reports with a **user-friendly dashboard**. To ensure portability and compatibility across various platforms, the project is fully containerized with Docker, simplifying deployment and usage on diverse operating systems and hardware configurations.
 
 ## Features
-- Real-time monitoring of CPU, memory, disk, and network metrics.
-- Alerts for critical conditions like high CPU/memory usage or low disk space.
-- User-friendly GUI powered by Zenity for report viewing and system monitoring.
-- Generates detailed reports in Markdown and HTML formats.
-- Dockerized for portability and reproducibility.
+- Real-time monitoring of **CPU, memory, disk, and network metrics**.
+- **Alerts** for critical conditions like high CPU/memory usage or low disk space.
+- **User-friendly GUI** powered by Zenity for report viewing and system monitoring.
+- Generates detailed reports in **Markdown and HTML formats**.
+- **Dockerized** for portability and reproducibility.
 
 ## Requirements
 
@@ -27,11 +27,16 @@ Ensure the following packages are installed:
 - `lshw`: For detailed hardware information.
 - `xdg-utils`: For opening files and URLs with default desktop applications.
 - `chromium`: For viewing HTML reports.
+- `mesa-utils`: For providing OpenGL utilities.
+- `bc`: For performing floating-point and arbitrary precision calculations in shell scripts.
+- `CUDA Toolkit 11.8`: For GPU monitoring and CUDA-based computations.
 
 Install these packages on Debian/Ubuntu-based systems with:
 ```bash
 sudo apt-get update
-sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium
+sudo apt-get update && sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium mesa-utils bc
+wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
+sudo dpkg -i cuda-keyring_1.0-1_all.deb
 ```
 
 ### For Docker Execution
@@ -42,10 +47,7 @@ sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-
 
 ### Running Locally (Without Docker) on VMs or WSL 2
 
-1- Ensure that above requirements are installed by running this command:
-```bash
-sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium
-```
+1- Ensure that above requirements are installed.
 
 2- Clone the repository:
 ```bash
