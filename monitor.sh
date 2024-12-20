@@ -14,7 +14,7 @@ function check_critical_conditions {
     zenity --error --text="ALERT: High Memory Usage ($MEM_USAGE%)" &
   fi
 
-  CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')  # User + System CPU usage
+  CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2 + $4}')
   echo "CPU Usage: $CPU_USAGE"
   if echo "$CPU_USAGE >= $CRITICAL_CPU_THRESHOLD" | bc -l | grep -q 1; then
     zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)" &
