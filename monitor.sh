@@ -19,8 +19,9 @@ function check_critical_conditions {
     zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)" &
   fi
 
-  DISK_USAGE=$(df / -h | awk 'NR==2 {gsub("%", "", $5); print $5}')
-  if [ "$DISK_USAGE" -gt "$CRITICAL_DISK_THRESHOLD" ]; then
+  DISK_USAGE=$(df -h | awk 'NR==7 {gsub("%", "", $5); print $5}')
+  echo "$DISK_USAGE"
+  if [ "$DISK_USAGE" -ge "$CRITICAL_DISK_THRESHOLD" ]; then
     zenity --error --text="ALERT: High Disk Usage ($DISK_USAGE%)" &
   fi
 
