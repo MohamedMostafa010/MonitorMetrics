@@ -20,7 +20,6 @@ function check_critical_conditions {
   fi
 
   DISK_USAGE=$(df -h | awk 'NR==7 {gsub("%", "", $5); print $5}')
-  echo "$DISK_USAGE"
   if [ "$DISK_USAGE" -ge "$CRITICAL_DISK_THRESHOLD" ]; then
     zenity --error --text="ALERT: High Disk Usage ($DISK_USAGE%)" &
   fi
@@ -38,14 +37,14 @@ function check_critical_conditions {
 }
 
 function monitor_system {
-  TIMESTAMP=$(date "+%Y-%m-%d_%H-%M-%S")
+  TIMESTAMP=$(date "+%Y-%m-%d-%Hh-%Mmin-%Ssec")
   REPORT_DIR="$LOG_DIR/$TIMESTAMP"
   mkdir -p "$REPORT_DIR"
 
   echo "=== CPU Metrics ===" > "$REPORT_DIR/cpu_$TIMESTAMP.log"
   mpstat 1 1 >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
 
-  echo "=== CPU Temperature ===" >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
+  echo "=== CPU Temperature (Will not work !!) ===" >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
   sensors >> "$REPORT_DIR/cpu_$TIMESTAMP.log"
 
   echo "=== GPU Metrics ===" > "$REPORT_DIR/gpu_$TIMESTAMP.log"
@@ -72,7 +71,9 @@ function monitor_system {
   echo "Disk Inodes Usage:" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
   df -i >> "$REPORT_DIR/disk_$TIMESTAMP.log"
   echo "=== SMART Status ===" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
-  smartctl -T permissive --all /dev/sda >> "$REPORT_DIR/disk_$TIMESTAMP.log" 2>/dev/null
+  # SMART Status will not work as intended or expected on "virtual disks"
+  smartctl -T permissive --all /dev/sde >> "$REPORT_DIR/disk_$TIMESTAMP.log" 2>/dev/null
+  echo "SMART Status will not work as intended or expected on 'virtual disks'" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
 
   echo "=== Network Statistics ===" > "$REPORT_DIR/network_$TIMESTAMP.log"
   ifconfig >> "$REPORT_DIR/network_$TIMESTAMP.log"
@@ -105,7 +106,68 @@ function monitor_system {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>System Monitoring Report ($TIMESTAMP)</title>
-  <link rel="stylesheet" href="/usr/local/share/css/report.css"> <!-- Update with actual CSS path -->
+  <style>
+    body, h1, h2, p, pre {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    body {
+        background-color: #f4f4f9;
+        color: #333;
+        line-height: 1.6;
+        font-size: 16px;
+        padding: 0 20px;
+    }
+
+    header {
+        background-color: #6200ea;
+        color: #fff;
+        text-align: center;
+        padding: 20px 10px;
+        border-radius: 10px;
+        margin: 20px auto;
+    }
+
+    section {
+        background: #fff;
+        margin: 20px auto;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+
+    section:hover {
+        transform: scale(1.02);
+    }
+
+    section h2 {
+        color: #6200ea;
+        margin-bottom: 10px;
+        border-bottom: 2px solid #ddd;
+        padding-bottom: 5px;
+    }
+
+    section pre {
+        background-color: #f9f9f9;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+        font-size: 0.95em;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.8em;
+        color: #555;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -114,7 +176,7 @@ function monitor_system {
   </header>
 EOF
 
-  for file in "$REPORT_DIR"/*_"$TIMESTAMP".log; do
+for file in "$REPORT_DIR"/*_"$TIMESTAMP".log; do
     SECTION=$(basename "$file" | sed "s/_$TIMESTAMP.log//")
     echo "<section id=\"$SECTION\">" >> "$HTML_REPORT"
     echo "<h2>${SECTION^}</h2>" >> "$HTML_REPORT"
@@ -122,11 +184,12 @@ EOF
     cat "$file" >> "$HTML_REPORT"
     echo "</pre>" >> "$HTML_REPORT"
     echo "</section>" >> "$HTML_REPORT"
-  done
+done
 
-  echo "</body></html>" >> "$HTML_REPORT"
+echo "</body></html>" >> "$HTML_REPORT"
 
-  zenity --info --text="Monitoring completed. Reports saved in $REPORT_DIR"
+zenity --info --text="Monitoring completed. Reports saved in $REPORT_DIR"
+
 }
 
 function view_reports {
@@ -157,9 +220,9 @@ function view_reports {
 
   if [ -f "$REPORT" ]; then
     if [[ "$REPORT" == *.html ]]; then
-      chromium --no-sandbox --disable-software-rasterizer --disable-gpu "$REPORT" &
+      chromium --no-sandbox --disable-software-rasterizer --disable-gpu --start-fullscreen "$REPORT" &
     else
-      zenity --text-info --filename="$REPORT" --title="Report Viewer"
+      zenity --text-info --filename="$REPORT" --title="Report Viewer" --width=1400 --height=1000 
     fi
   else
     zenity --error --text="The selected file does not exist or is not a valid file."
