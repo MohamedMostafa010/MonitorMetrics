@@ -4,10 +4,10 @@ LOG_DIR="/app/monitoring_logs"
 mkdir -p "$LOG_DIR"
 
 function check_critical_conditions {
-  CRITICAL_MEMORY_THRESHOLD=1  # Memory usage over 80%
-  CRITICAL_CPU_THRESHOLD=0     # CPU usage over 90%
+  CRITICAL_MEMORY_THRESHOLD=1  # Memory usage over 1%
+  CRITICAL_CPU_THRESHOLD=0     # CPU usage over 0%
   CRITICAL_TEMP_THRESHOLD=80    # Temperature over 80°C
-  CRITICAL_DISK_THRESHOLD=1    # Disk usage over 90%
+  CRITICAL_DISK_THRESHOLD=1    # Disk usage over 1%
 
   MEM_USAGE=$(free | awk '/Mem:/ {printf "%.0f", $3/$2 * 100}')
   if [ "$MEM_USAGE" -gt "$CRITICAL_MEMORY_THRESHOLD" ]; then
