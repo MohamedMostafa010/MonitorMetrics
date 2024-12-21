@@ -16,6 +16,9 @@ This project delivers a comprehensive system monitoring solution using a **Zenit
 ### For Direct Execution (Without Docker)
 Ensure the following packages are installed:
 - `sysstat`: For CPU and memory metrics.
+- `dos2unix`: Command is used to convert text files from the DOS/Windows format to the Unix/Linux format, also to fix Line Ending Issues.
+- `python3`: Command used to run Python 3.x on your system. Python is a programming language, and python3 specifically refers to version 3 of Python. It is the recommended version for most current development work, as Python 2 is no longer supported.
+- `python3-pip`: This is the package manager for Python 3. It allows you to install, upgrade, and manage Python libraries and packages from the Python Package Index (PyPI). It's used for installing third-party libraries or tools that are not part of the Python standard library.
 - `lm-sensors`: For temperature monitoring.
 - `smartmontools`: For disk health checks.
 - `zenity`: For GUI support.
@@ -35,9 +38,11 @@ Ensure the following packages are installed:
 Install these packages on Debian/Ubuntu-based systems with:
 ```bash
 sudo apt-get update
-sudo apt-get update && sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium mesa-utils bc rocm-smi
+sudo apt-get update && sudo apt-get install -y sysstat lm-sensors smartmontools zenity pandoc curl net-tools iproute2 x11-utils lshw xdg-utils chromium mesa-utils bc rocm-smi dos2unix python3 python3-pip
 wget https://developer.download.nvidia.com/compute/cuda/repos/debian11/x86_64/cuda-keyring_1.0-1_all.deb
 sudo dpkg -i cuda-keyring_1.0-1_all.deb
+sudo apt-get update && apt-get install -y
+cuda-toolkit-11-8
 ```
 
 ### For Docker Execution
