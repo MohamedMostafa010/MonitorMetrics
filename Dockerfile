@@ -13,6 +13,8 @@ RUN apt-get update && apt-get install -y \
     liburcu-dev \
     sysstat \
     dos2unix \
+    python3 \
+    python3-pip \
     lm-sensors \
     smartmontools \
     zenity \
@@ -27,7 +29,11 @@ RUN apt-get update && apt-get install -y \
     mesa-utils \
     bc \
     rocm-smi \
-    && rm -rf /var/lib/apt/lists/*  # Clean up the apt cache to reduce image size
+    && rm -rf /var/lib/apt/lists/*
+
+COPY generate_md_report.py /usr/local/bin/generate_md_report.py
+
+RUN chmod +x /usr/local/bin/generate_md_report.py
 
 COPY monitor.sh /usr/local/bin/monitor.sh
 
