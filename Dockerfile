@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     liburcu-dev \
     sysstat \
+    dos2unix \
     lm-sensors \
     smartmontools \
     zenity \
