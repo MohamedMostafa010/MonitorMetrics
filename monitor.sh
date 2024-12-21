@@ -88,15 +88,8 @@ function monitor_system {
 
   check_critical_conditions
 
-  REPORT_FILE="$REPORT_DIR/report_$TIMESTAMP.md"
-  echo "# System Monitoring Report ($TIMESTAMP)" > "$REPORT_FILE"
-  for file in "$REPORT_DIR"/*_"$TIMESTAMP".log; do
-    SECTION=$(basename "$file" | sed "s/_$TIMESTAMP.log//")
-    echo >> "$REPORT_FILE"
-    echo "## $SECTION" >> "$REPORT_FILE"
-    echo >> "$REPORT_FILE"
-    cat "$file" >> "$REPORT_FILE"
-  done
+  PYTHON_SCRIPT="/usr/local/bin/generate_md_report.py"
+  python3 "$PYTHON_SCRIPT" "$REPORT_DIR" "$TIMESTAMP"
 
   HTML_REPORT="$REPORT_DIR/report_$TIMESTAMP.html"
   cat <<EOF > "$HTML_REPORT"
