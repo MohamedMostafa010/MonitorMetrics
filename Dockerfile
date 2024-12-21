@@ -30,6 +30,8 @@ RUN apt-get update && apt-get install -y \
 
 COPY monitor.sh /usr/local/bin/monitor.sh
 
+RUN dos2unix /usr/local/bin/monitor.sh
+
 RUN chmod +x /usr/local/bin/monitor.sh
 
 WORKDIR /app
