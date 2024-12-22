@@ -5,9 +5,9 @@ mkdir -p "$LOG_DIR"
 
 function check_critical_conditions {
   CRITICAL_MEMORY_THRESHOLD=4  # Memory usage over 4%
-  CRITICAL_CPU_THRESHOLD=20     # CPU usage over 20%
+  CRITICAL_CPU_THRESHOLD=0     # CPU usage over 20%
   CRITICAL_TEMP_THRESHOLD=80    # Temperature over 80°C
-  CRITICAL_DISK_THRESHOLD=30    # Disk usage over 30%
+  CRITICAL_DISK_THRESHOLD=20    # Disk usage over 30%
 
   MEM_USAGE=$(free | awk '/Mem:/ {printf "%.0f", $3/$2 * 100}')
   if [ "$MEM_USAGE" -gt "$CRITICAL_MEMORY_THRESHOLD" ]; then
