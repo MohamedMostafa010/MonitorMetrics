@@ -22,7 +22,6 @@ function check_critical_conditions {
   DISK_USAGE=$(df -h | awk '/\/mnt\/c|\/mnt\/d|\/mnt\/e/ {
     size += $2+0;
     used += $3+0;
-    avail += $4+0
 }
 END {
     used_percentage = (used / size) * 100;
