@@ -4,10 +4,10 @@ LOG_DIR="/app/monitoring_logs"
 mkdir -p "$LOG_DIR"
 
 function check_critical_conditions {
-  CRITICAL_MEMORY_THRESHOLD=1  # Memory usage over 1%
-  CRITICAL_CPU_THRESHOLD=0     # CPU usage over 0%
+  CRITICAL_MEMORY_THRESHOLD=4  # Memory usage over 4%
+  CRITICAL_CPU_THRESHOLD=20     # CPU usage over 20%
   CRITICAL_TEMP_THRESHOLD=80    # Temperature over 80°C
-  CRITICAL_DISK_THRESHOLD=1    # Disk usage over 1%
+  CRITICAL_DISK_THRESHOLD=30    # Disk usage over 30%
 
   MEM_USAGE=$(free | awk '/Mem:/ {printf "%.0f", $3/$2 * 100}')
   if [ "$MEM_USAGE" -gt "$CRITICAL_MEMORY_THRESHOLD" ]; then
@@ -19,8 +19,16 @@ function check_critical_conditions {
     zenity --error --text="ALERT: High CPU Usage ($CPU_USAGE%)" &
   fi
 
-  DISK_USAGE=$(df -h | awk 'NR==7 {gsub("%", "", $5); print $5}')
-  if [ "$DISK_USAGE" -ge "$CRITICAL_DISK_THRESHOLD" ]; then
+  DISK_USAGE=$(df -h | awk '/\/mnt\/c|\/mnt\/d|\/mnt\/e/ {
+    size += $2+0;
+    used += $3+0;
+    avail += $4+0
+}
+END {
+    used_percentage = (used / size) * 100;
+    print int(used_percentage);
+}')
+  if [ $(echo "$DISK_USAGE >= $CRITICAL_DISK_THRESHOLD" | bc) -eq 1 ]; then
     zenity --error --text="ALERT: High Disk Usage ($DISK_USAGE%)" &
   fi
 
@@ -69,7 +77,7 @@ function monitor_system {
   echo "=== Disk Usage ===" > "$REPORT_DIR/disk_$TIMESTAMP.log"
   df -h >> "$REPORT_DIR/disk_$TIMESTAMP.log"
   echo "Disk Inodes Usage:" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
-  df -i >> "$REPORT_DIR/disk_$TIMESTAMP.log"
+  df -ih >> "$REPORT_DIR/disk_$TIMESTAMP.log"
   echo "=== SMART Status ===" >> "$REPORT_DIR/disk_$TIMESTAMP.log"
   # SMART Status will not work as intended or expected on "virtual disks"
   smartctl -T permissive --all /dev/sde >> "$REPORT_DIR/disk_$TIMESTAMP.log" 2>/dev/null
