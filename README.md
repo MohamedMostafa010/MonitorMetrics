@@ -112,7 +112,7 @@ local: This option specifies that the restriction applies to local connections, 
 
 2- Run the container:
 ```bash
-docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host --gpus all -v /home/user/system_logs:/app/monitoring_logs system-monitor > /dev/null 2>&1
+docker run --rm -it --name system-monitor --privileged --device=/dev/sda --env DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --net=host --gpus all -v /home/user/system_logs:/app/monitoring_logs -v /mnt/c:/mnt/c -v /mnt/d:/mnt/d -v /mnt/e:/mnt/e -v /proc:/host_proc --cpus="4" system-monitor > /dev/null 2>&1
 ```
 - **docker run:** Launches a new container from the specified image.
 - **--rm:** Automatically removes the container when it stops.
