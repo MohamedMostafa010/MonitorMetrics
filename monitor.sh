@@ -5,7 +5,7 @@ mkdir -p "$LOG_DIR"
 
 function check_critical_conditions {
   CRITICAL_MEMORY_THRESHOLD=4  # Memory usage over 4%
-  CRITICAL_CPU_THRESHOLD=0     # CPU usage over 20%
+  CRITICAL_CPU_THRESHOLD=0     # CPU usage over 0%
   CRITICAL_TEMP_THRESHOLD=80    # Temperature over 80°C
   CRITICAL_DISK_THRESHOLD=20    # Disk usage over 30%
 
