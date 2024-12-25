@@ -1,4 +1,4 @@
-# OS 12th Project
+# Operating Systems 12th week Project
 
 # System Monitoring Project 
 
