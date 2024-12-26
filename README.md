@@ -155,7 +155,7 @@ docker-compose down
 **- View Reports:**
   - Reports are saved in the monitoring_logs directory. Select a report through the GUI to view details.
 
-### Screenshots and Visualizations
+# Screenshots and Visualizations
 ![Dashboard](assets/Picture1.png)
 ![Window 1](assets/Picture2.png)
 ![Window 2](assets/Picture3.png)
