@@ -157,7 +157,7 @@ docker-compose down
 
 # Screenshots and Visualizations
 ![Dashboard](assets/Picture1.png)
-<img src="assets/Picture2.png" width="500" height="400"/>
+<img src="assets/Picture2.png" width="350" height="350"/>
 ![Window 2](assets/Picture3.png)
 ![Report Sample](assets/Picture4.png)
 ![Alert Sample 1](assets/Picture5.png)
