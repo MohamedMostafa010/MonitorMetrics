@@ -160,5 +160,5 @@ docker-compose down
 <img src="assets/Picture2.png" width="350" height="350"/>
 <img src="assets/Picture3.png" width="350" height="350"/>
 <img src="assets/Picture4.png" width="350" height="350"/>
-<img src="assets/Picture5.png" width="200" height="200"/>
-<img src="assets/Picture6.png" width="200" height="200"/>
+<img src="assets/Picture5.png" width="300" height="200"/>
+<img src="assets/Picture6.png" width="300" height="200"/>
