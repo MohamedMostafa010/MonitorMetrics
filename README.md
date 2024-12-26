@@ -157,3 +157,8 @@ docker-compose down
 
 ### Screenshots and Visualizations
 ![Dashboard](assets/Picture1.png)
+![Window 1](assets/Picture1.png)
+![Window 2](assets/Picture1.png)
+![Report Sample](assets/Picture1.png)
+![Alert Sample 1](assets/Picture1.png)
+![Alert Sample 2](assets/Picture1.png)
