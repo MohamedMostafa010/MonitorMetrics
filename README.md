@@ -57,8 +57,8 @@ cuda-toolkit-11-8
 
 2- Clone the repository:
 ```bash
-git clone https://github.com/yourusername/system-monitoring.git
-cd system-monitoring
+git clone https://github.com/MohamedMostafa010/MonitorMetrics.git
+cd MonitorMetrics
 ```
 
 3- Make the script executable:
